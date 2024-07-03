@@ -34,9 +34,9 @@
             <div class="card-body">
                 <form id="loginForm" action="/login" method="post" onsubmit="return validateForm()">
                     <div class="form-group">
-                        <label for="username">Enter Username</label>
-                        <input type="text" class="form-control" name="username" id="username" placeholder="Username">
-                        <div id="usernameError" class="error"></div>
+                        <label for="email">Enter Email</label>
+                        <input type="email" class="form-control" name="email" id="email" placeholder="Email">
+                        <div id="emailError" class="error"></div>
                     </div>
                     <div class="form-group">
                         <label for="password">Enter Password</label>
@@ -115,16 +115,16 @@
     function validateForm() {
         var isValid = true;
 
-        var username = document.getElementById('username').value.trim();
+        var username = document.getElementById('email').value.trim();
         var password = document.getElementById('password').value.trim();
         var captchaInput = document.getElementById('captchaInput').value.trim();
 
-        document.getElementById('usernameError').textContent = "";
+        document.getElementById('emailError').textContent = "";
         document.getElementById('passwordError').textContent = "";
         document.getElementById('captchaError').textContent = "";
 
         if (!username) {
-            document.getElementById('usernameError').textContent = "Please fill out the username field.";
+            document.getElementById('emailError').textContent = "Please fill out the email field.";
             isValid = false;
         }
 

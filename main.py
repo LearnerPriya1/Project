@@ -65,7 +65,7 @@ class Token(BaseModel):
     token_type: str
 
 class TokenData(BaseModel):
-    username: Optional[str] = None
+    email: Optional[str] = None
 
 # Utility functions
 def verify_password(plain_password, hashed_password):
@@ -74,20 +74,20 @@ def verify_password(plain_password, hashed_password):
 def get_password_hash(password):
     return pwd_context.hash(password)
 
-def get_user(username: str, users_collection):
+def get_user(email: str, users_collection):
     try:
-        user = users_collection.find_one({"username": username})
+        user = users_collection.find_one({"email": email})
         if user:
-            logging.info(f"User '{username}' found: {user}")
+            logging.info(f"User '{email}' found: {user}")
         else:
-            logging.warning(f"User '{username}' not found.")
+            logging.warning(f"User '{email}' not found.")
         return user  # Return the user document found
     except PyMongoError as e:
-        logging.error(f"PyMongoError fetching user '{username}' from MongoDB: {e}")
+        logging.error(f"PyMongoError fetching user '{email}' from MongoDB: {e}")
         return None
     
-def authenticate_user(username: str, password: str):
-    user = get_user(username, users_collection)
+def authenticate_user(email: str, password: str):
+    user = get_user(email, users_collection)
     if user and verify_password(password, user['hashed_password']):
         return user
     return None
@@ -109,14 +109,15 @@ async def decode_token(token: str = Depends(oauth2_scheme)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
+        email: str = payload.get("email")
         role: str = payload.get("role")
-        if username is None :
+        if email is None :
             raise credentials_exception
-        token_data = TokenData(username=username)
+        token_data = TokenData(email=email)
     except JWTError as e:
         logging.error(f"JWT decoding error: {e}")
         raise credentials_exception
-    user = get_user(username=token_data.username, users_collection=users_collection)
+    user = get_user(email=token_data.email, users_collection=users_collection)
     logging.info(user)
     logging.debug(f"User details from database: {user}")  # Add this line for debugging
 
@@ -141,7 +142,7 @@ async def login_get(request: Request):
 @app.post("/login")
 async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = authenticate_user(form_data.username, form_data.password)
+        user = authenticate_user(form_data.email, form_data.password)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
