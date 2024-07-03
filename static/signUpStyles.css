@@ -1,0 +1,152 @@
+html, body {
+    background-image: url('https://wallpaperaccess.com/full/2314983.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    height: 100%;
+    font-family: 'Numans', sans-serif;
+    color: white;
+    }
+
+.page-header {
+    color: white;
+    }
+
+.container {
+    height: 90%;
+    align-content: center;
+    }
+
+.card {
+    height: 550px;
+    margin-top: auto;
+    margin-bottom: auto;
+    width: 450px;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    }
+
+.card-header h3 {
+    color: white;
+    }
+
+.card-body {
+    color: white;
+    margin-bottom: -30px;
+    }
+
+input:focus {
+    outline: 0 0 0 0 !important;
+    box-shadow: 0 0 0 0 !important;
+    }
+
+.login_btn {
+    color: black;
+    background-color: #55ff12;
+    width: 100px;
+    }
+
+.login_btn:hover {
+    color: black;
+    opacity: 0.8;
+    }
+
+.refresh_btn {
+    color: white;
+    background-color: #007bff;
+    width: 100px;
+    border: none;
+    }
+
+.refresh_btn:hover {
+    background-color: #0056b3;
+    }
+
+.links {
+    color: white;
+    }
+
+.links a {
+    margin-left: 4px;
+    }
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    }
+
+.input-group {
+    margin-bottom: 1.5rem;
+    width: 100%;
+    }
+
+.input-group input {
+    width: 100%;
+    }
+
+.show-password {
+    margin-top: 10px;
+    }
+
+    /* Disable native password reveal icon in Edge */
+input::-ms-reveal {
+    display: none;
+    }
+
+    /* Disable native password reveal icon in Webkit browsers */
+input::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    }
+
+.captcha {
+    display: flex;
+    align-items: center;
+    }
+
+.captcha input[type="text"] {
+    flex: 1;
+    padding: 0.5rem;
+    font-size: medium;
+    }
+
+.captcha img {
+    margin-left: 0.5rem;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    }
+
+.captcha button {
+    margin-left: 1rem;
+    padding: 0.2rem 0.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    }
+
+.captcha button.refresh_btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    }
+
+.captcha button.refresh_btn:hover {
+    background-color: #0056b3;
+    }
+
+.captcha button[type="submit"] {
+    background-color: #55ff12;
+    color: black;
+    border: none;
+    }
+
+.captcha button[type="submit"]:hover {
+    background-color: #3bbf4c;
+    }
+
+    /* Centering login button */
+.card-footer {
+    display: flex;
+    justify-content: center;
+    }
+.error {
+    color: red;
+    font-size: 0.875em;
+}

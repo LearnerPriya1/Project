@@ -1,0 +1,113 @@
+{% extends "sidebar.html" %}
+{% block content %}
+
+<title>Shipments</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+        background-color: #f0f0f0;
+        padding: 20px;
+        height: fit-content;
+    }
+    .card-container {
+        max-width: 800px; /* Max width of the container */
+        margin-top: 16px;
+    }
+    .card {
+        width: 200%; /* Full width for each card */
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 16px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        cursor: pointer;
+        transition: box-shadow 0.3s ease;
+        overflow: hidden; /* Ensure content inside doesn't overflow */
+        margin-bottom: 16px;
+        max-width: 800px; /* Max width of the card */
+        transform: translateX(-50%);
+        left: 50%;
+        position: relative;
+    }
+    .card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    }
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        cursor: pointer;
+    }
+    .card-header h3 {
+        margin: 0;
+    }
+    .card-details {
+        display: none;
+        padding-top: 8px;
+        border-top: 1px solid #ccc;
+        color: #666;
+        font-size: 14px;
+    }
+    .toggle-button {
+        text-align: center;
+        margin-top: 8px;
+        color: #007bff;
+        cursor: pointer;
+    }
+</style>
+<script>
+    function toggleDetails(card) {
+        var details = card.querySelector('.card-details');
+        var toggleButton = card.querySelector('.toggle-button');
+        var isExpanded = details.style.display === 'block';
+
+        // Collapse all cards
+        var allCards = document.querySelectorAll('.card');
+        allCards.forEach(function (c) {
+            var cardDetails = c.querySelector('.card-details');
+            var cardToggleButton = c.querySelector('.toggle-button');
+            if (c !== card) {
+                cardDetails.style.display = 'none';
+                cardToggleButton.textContent = 'Show Details';
+            }
+        });
+
+        // Toggle the clicked card's details
+        details.style.display = isExpanded ? 'none' : 'block';
+        toggleButton.textContent = isExpanded ? 'Show Details' : 'Hide Details';
+    }
+</script>
+</head>
+<body>
+<h1>Shipments</h1>
+<div class="card-container">
+    {% for shipment in shipments %}
+    <div class="card justify-content-center" onclick="toggleDetails(this)">
+        <div class="card-header">
+            <h3>Submitted By: {{ shipment.username }}</h3>
+            <div>Role: {{ shipment.role }}</div>
+        </div>
+        <div class="card-details">
+            <p><strong>Container No:</strong> {{ shipment.container_no }}</p>
+            <p><strong>Route Details:</strong> {{ shipment.route_details }}</p>
+            <p><strong>Goods Type:</strong> {{ shipment.goods_type }}</p>
+            <p><strong>Device:</strong> {{ shipment.device }}</p>
+            <p><strong>Expected Delivery Date:</strong> {{ shipment.expected_delivery_date }}</p>
+            <p><strong>PO Number:</strong> {{ shipment.po_number }}</p>
+            <p><strong>Delivery Number:</strong> {{ shipment.delivery_number }}</p>
+            <p><strong>NDC Number:</strong> {{ shipment.ndc_number }}</p>
+            <p><strong>Batch ID:</strong> {{ shipment.batch_id }}</p>
+            <p><strong>Serial Number of Goods:</strong> {{ shipment.serial_number_of_goods }}</p>
+            <p><strong>Description:</strong> {{ shipment.shipment_description }}</p>
+        </div>
+        <div class="toggle-button">Show Details</div>
+    </div>
+    {% endfor %}
+</div>
+</body>
+{% endblock %}

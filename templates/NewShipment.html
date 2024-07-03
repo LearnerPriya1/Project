@@ -1,0 +1,118 @@
+{% extends "sidebar.html" %}
+{% block content %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" crossorigin="anonymous">
+    <link href="/static/shipmentstyles.css" rel="stylesheet">
+
+<div class="container justify-content-center"> 
+    <div class="form-container">
+        <h3 class="text-center mt-3">Create New Shipment</h3>
+        
+        <div class="container">
+            <div class="card">
+                <h5 class="text-center">Please fill out the details</h5>
+                <div style="text-align: center;">
+                    {% if successmsg %}
+                        <h6 style="color: rgb(98, 245, 12);">{{ successmsg }}</h6>
+                    {% endif %}
+                </div>
+                <form action="/newshipment" method="post" id="shipment-form">
+                    <div class="form-card section active" id="new-shipment-section">
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="Shipment-no" class="form-control-label">Shipment Number*</label>
+                                <input type="text" id="Shipment-no" name="Shipment_no" class="form-control" placeholder="Enter Shipment Number" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="Container-no" class="form-control-label">Container Number*</label>
+                                <input type="text" id="Container-no" name="Container_no" class="form-control" placeholder="Enter Container number" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div  class="form-group col-md-6">
+                                <label for="Route-details" class="form-control-label">Route Details*</label>
+                                <select style="font-size:12px;" id="Route-details" name="Route_details" class="form-control" required>
+                                    <option value="">Select Route Details</option>
+                                    <option value="1">Option 1</option>
+                                    <option value="2">Option 2</option>
+                                    <option value="3">Option 3</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="Goods-type" class="form-control-label">Goods Type*</label>
+                                <select style="font-size:12px;" id="Goods-type" name="Goods_type" class="form-control" required>
+                                    <option value="">Select Goods Type</option>
+                                    <option value="1">Option 1</option>
+                                    <option value="2">Option 2</option>
+                                    <option value="3">Option 3</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="Device" class="form-control-label">Device*</label>
+                                <select style="font-size:12px;" id="Device" name="Device" class="form-control" required>
+                                    <option value="">Select Device</option>
+                                    <option value="1">Option 1</option>
+                                    <option value="2">Option 2</option>
+                                    <option value="3">Option 3</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="Expected-delivery-date" class="form-control-label">Expected Delivery Date*</label>
+                                <input type="date" id="Expected-delivery-date" name="Expected_delivery_date" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="PO-number" class="form-control-label">PO Number*</label>
+                                <input type="text" id="PO-number" name="PO_number" class="form-control" placeholder="Enter PO Number" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="Delivery-number" class="form-control-label">Delivery Number*</label>
+                                <input type="text" id="Delivery-number" name="Delivery_number" class="form-control" placeholder="Enter Delivery Number" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="NDC-number" class="form-control-label">NDC Number*</label>
+                                <input type="text" id="NDC-number" name="NDC_number" class="form-control" placeholder="Enter NDC Number" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="Batch-id" class="form-control-label">Batch Id*</label>
+                                <input type="text" id="Batch-id" name="Batch_id" class="form-control" placeholder="Enter Batch Id" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-md-6">
+                                <label for="Serial-number-of-goods" class="form-control-label">Serial Number of Goods*</label>
+                                <input type="text" id="Serial-number-of-goods" name="Serial_number_of_goods" class="form-control" placeholder="Enter Serial Number of Goods" required>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="Shipment-description" class="form-control-label">Shipment Description*</label>
+                                <input type="text" id="Shipment-description" name="Shipment_description" class="form-control" placeholder="Description" required>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <div class="form-group col-md-3">
+                                <button type="submit" class="btn btn-block btn-primary">Create Shipment</button>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <button type="button" class="btn btn-block btn-danger" id="clear-button">Clear Details</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <script>
+        document.getElementById("clear-button").addEventListener("click", function() {
+            document.getElementById("shipment-form").reset();
+        });
+    </script>
+{% endblock %}

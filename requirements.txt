@@ -1,0 +1,7 @@
+fastApi
+pymongo
+jose
+passlib
+pydantic
+pyjwt
+

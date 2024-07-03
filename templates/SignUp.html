@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="/static/signUpStyles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Page</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    
+</head>
+<body>
+    <div class="container">
+        <div class="page-header">
+            <h1 style="text-align: center;">SCMXPertLite</h1>
+        </div>
+       
+        <div class="d-flex justify-content-center h-100">
+            <div class="card">
+                <div class="card-header">
+                    <h3 style="text-align: center;">Create Your Account</h3>
+                    <div style="text-align: center;">
+                    {% if message %}
+                        <p style="color: red;">{{ message }}</p>
+                    {% endif %}
+                    </div>
+                </div>
+                <div class="card-body">
+                    <form id="registerForm" action="/register" method="post" onsubmit="return validateForm()">
+                        <div class="form-group">
+                            <label for="username">Enter Your Full Name*</label>
+                            <input type="text" class="form-control" id="username" name="username" placeholder="Your Username">
+                            <div id="usernameError" class="error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Enter Email*</label>
+                            <input type="text" class="form-control" id="email" name="email" placeholder="Your Email">
+                            <div id="emailError" class="error"></div>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">Create New Password*</label>
+                            <input type="password" class="form-control" id="password" name="password" placeholder="Enter Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Password must contain at least one number, one uppercase, one lowercase letter, and be at least 8 characters long" required>
+                            <div id="passwordError" class="error"></div>
+                            
+                        </div>
+                        <div class="form-group">
+                            <label for="confirm-password">Confirm Password*</label>
+                            <input type="password" class="form-control" id="confirm-password" name="confirm-password" placeholder="Confirm Your Password" pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" title="Password must contain at least one number, one uppercase, one lowercase letter, and be at least 8 characters long" required>
+                            <div id="confirmPasswordError" class="error"></div>
+                            <div class="show-password">
+                                <input type="checkbox" onclick="togglePasswordVisibility()"> Show Password
+                            </div>
+                        </div>
+                        <div class="text-center form-group">
+                            <input type="submit" value="Register" class="btn login_btn">
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-center links">
+                        Already an User? <a href="/">Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function togglePasswordVisibility() {
+            var passwordField = document.getElementById("password");
+            var confirmPasswordField = document.getElementById("confirm-password");
+            if (passwordField.type === "password") {
+                passwordField.type = "text";
+                confirmPasswordField.type = "text";
+            } else {
+                passwordField.type = "password";
+                confirmPasswordField.type = "password";
+            }
+        }
+
+        function validateForm() {
+            var isValid = true;
+
+            var username = document.getElementById('username').value.trim();
+            var email = document.getElementById('email').value.trim();
+            var password = document.getElementById('password').value.trim();
+            var confirmPassword = document.getElementById('confirm-password').value.trim();
+
+            document.getElementById('usernameError').textContent = "";
+            document.getElementById('emailError').textContent = "";
+            document.getElementById('passwordError').textContent = "";
+            document.getElementById('confirmPasswordError').textContent = "";
+
+            if (!username) {
+                document.getElementById('usernameError').textContent = "Please fill out the username field.";
+                isValid = false;
+            }
+
+            if (!email) {
+                document.getElementById('emailError').textContent = "Please fill out the email field.";
+                isValid = false;
+            }
+
+            if (!password) {
+                document.getElementById('passwordError').textContent = "Please fill out the password field.";
+                isValid = false;
+            }
+
+            if (!confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = "Please fill out the confirm password field.";
+                isValid = false;
+            }
+
+            if (password && confirmPassword && password !== confirmPassword) {
+                document.getElementById('confirmPasswordError').textContent = "Passwords do not match.";
+                isValid = false;
+            }
+
+            return isValid;
+        }
+    </script>
+</body>
+</html>

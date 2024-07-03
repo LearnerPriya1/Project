@@ -1,0 +1,46 @@
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    display: flex;
+    background-image: url('https://as2.ftcdn.net/v2/jpg/01/65/12/73/1000_F_165127304_Q64vJFyW7s0ctdbG2E9cToRg5MSF9QaP.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+
+
+#dashboard-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    color: black;
+}
+
+#dashboard-section .links {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    padding: 0 10px;
+    text-align: center;
+    margin-right: 300px;
+}
+
+#dashboard-section .links div {
+    width: 45%;
+}
+
+#dashboard-section .links a {
+    text-decoration: none;
+    color: white;
+    padding: 10px 20px;
+    background-color: #007bff;
+    border-radius: 5px;
+    display: inline-block;
+    width: 100%;
+}
+
+#dashboard-section .links a:hover {
+    background-color: #0056b3;
+}
