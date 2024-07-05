@@ -1,59 +1,163 @@
 {% extends "sidebar.html" %}
 {% block content %}
 
-    <meta charset="UTF-8">
-    <link href="/static/myaccount.css" rel="stylesheet"></link>
+<meta charset="UTF-8">
+<link href="/static/myaccount.css" rel="stylesheet"></link>
 
+<style>
 
-   
-        <div class="container">
-            <div class="page-content page-container" id="page-content">
-                <div class="padding">
-                    <div style="text-align: center;">
-                        <h1>My Account</h1><br>
-                    </div>
-                    
-                    <div class="row container d-flex justify-content-center">
-                        <div class="col-xl-6 col-md-12 justify-content-center">
-                            <div class="card user-card-full">
-                                <div class="row m-l-0 m-r-0">
-                                    <div class="col-sm-4 bg-c-lite-green user-profile">
-                                        <div class="card-block text-center text-white">
-                                            <div class="m-b-25">
-                                                <img src="https://img.icons8.com/bubbles/100/000000/user.png" class="img-radius" alt="User-Profile-Image">
-                                            </div>
-                                            <div style="text-align: center;">
-                                                <h6 class="f-w-600">{{ user.username }}</h6>
-                                                <p>{{  user.role }}</p>
-                                            </div>
-                                        </div>
+    .action-buttons button {
+        padding: 5px 10px;
+        font-size: 12px;
+        min-width: 120px; /* Set a minimum width for the buttons */
+    }
+
+</style>
+
+<div class="container">
+    <div class="page-content page-container" id="page-content">
+        <div class="padding">
+            <div style="text-align: center;">
+                <h1 style="color: white;">My Account</h1><br>
+            </div>
+
+            <div class="row container d-flex justify-content-center">
+                <div class="col-xl-6 col-md-12 justify-content-center">
+                    <div class="card user-card-full">
+                        <div class="row m-l-0 m-r-0">
+                            <div class="col-sm-4 bg-c-lite-green user-profile">
+                                <div class="card-block text-center text-white">
+                                    <div class="m-b-25">
+                                        <img src="https://img.icons8.com/bubbles/100/000000/user.png" class="img-radius" alt="User-Profile-Image">
                                     </div>
-                                    <div class="col-sm-8" id="user-details">
-                                        <div class="card-block">
-                                            <div class="page-header">
-                                                <h6 class="m-b-20 p-b-5 b-b-default f-w-600 text-center">Information</h6>
-                                            </div>
-                                            <div>
-                                                <p class="m-b-10 f-w-600">Username</p>
-                                                <h6 class="text-muted f-w-400">{{ user.username }}</h6>
-                                            </div>
-                                            <div>
-                                                <p class="m-b-10 f-w-600">Email</p>
-                                                <h6 class="text-muted f-w-400">{{ user.email }}</h6>
-                                            </div>
-                                            <div>
-                                                <p class="m-b-10 f-w-600">Role</p>
-                                                <h6 class="text-muted f-w-400">{{ user.role }}</h6>
-                                            </div>  
-                                        </div>
+                                    <div style="text-align: center;">
+                                        <h6 class="f-w-600">{{ user.username }}</h6>
+                                        <p>{{ user.role }}</p>
                                     </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-8" id="user-details">
+                                <div class="card-block">
+                                    <div class="page-header">
+                                        <h6 class="m-b-20 p-b-5 b-b-default f-w-600 text-center">Information</h6>
+                                    </div>
+                                    <div>
+                                        <p class="m-b-10 f-w-600">Username</p>
+                                        <h6 class="text-muted f-w-400">{{ user.username }}</h6>
+                                    </div>
+                                    <div>
+                                        <p class="m-b-10 f-w-600">Email</p>
+                                        <h6 class="text-muted f-w-400">{{ user.email }}</h6>
+                                    </div>
+                                    <div>
+                                        <p class="m-b-10 f-w-600">Role</p>
+                                        <h6 class="text-muted f-w-400">{{ user.role }}</h6>
+                                    </div>  
                                 </div>
                             </div>
                         </div>
                     </div>
-                    
                 </div>
             </div>
+
+            {% if user.role == "admin" %}
+            <div class="row container d-flex justify-content-center">
+                <div class="col-xl-10 col-md-12 justify-content-center">
+                    <div class="card">
+                        <div class="card-header">
+                            <h6 class="m-b-20 p-b-5 b-b-default f-w-600 text-center">User List</h6>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-bordered">
+                                <thead>
+                                    <tr style="text-align: center;">
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Role</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for u in users %}
+                                    <tr style="text-align: center;">
+                                        <td>{{ u.username }}</td>
+                                        <td>{{ u.email }}</td>
+                                        <td>{{ u.role }}</td>
+                                        <td class="action-buttons">
+                                            {% if u.role == "user" %}
+                                            <button class="btn btn-sm btn-primary" onclick="updateAsAdmin('{{ u.username }}')">Update as Admin</button>
+                                            {% else %}
+                                            <button class="btn btn-sm btn-primary" onclick="updateAsUser('{{ u.username }}')">Update as User</button>
+                                            {% endif %}
+                                            <button class="btn btn-sm btn-danger" onclick="deleteUser('{{ u.username }}')">Delete User</button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
         </div>
+    </div>
+</div>
+
+<script>
+    function updateAsAdmin(username) {
+    fetch(`/update-role/${username}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ role: 'admin' })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.message); // Handle success message
+        // Optionally update UI or perform additional actions
+        window.location.reload(); // Reload the page after action
+    })
+    .catch(error => {
+        console.error('Error:', error); // Handle error
+    });
+}
+
+function updateAsUser(username) {
+    fetch(`/update-role/${username}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ role: 'user' })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.message); // Handle success message
+        // Optionally update UI or perform additional actions
+        window.location.reload(); // Reload the page after action
+    })
+    .catch(error => {
+        console.error('Error:', error); // Handle error
+    });
+}
+
+function deleteUser(username) {
+    fetch(`/delete-user/${username}`, {
+        method: 'DELETE'
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.message); // Handle success message
+        // Optionally update UI or perform additional actions
+        window.location.reload(); // Reload the page after action
+    })
+    .catch(error => {
+        console.error('Error:', error); // Handle error
+    });
+}
+
+</script>
 
 {% endblock %}

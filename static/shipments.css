@@ -1,11 +1,13 @@
 body {
+    background-image: url('https://wallpaperaccess.com/full/2314983.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
     flex-direction: column;
     align-items: center;
     margin: 0;
-    background-color: #f0f0f0;
     padding: 20px;
     height: fit-content;
 }

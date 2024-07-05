@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Request, Form, Depends, HTTPException, status
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles 
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm 
 from jose import JWTError,jwt
@@ -44,7 +44,10 @@ class UserInDB(BaseModel):
     username: str
     hashed_password: str
     email: str
-    role: str  # Add role field
+    role: str  
+
+class RoleUpdateRequest(BaseModel):
+    role: str
 
 class Shipment(BaseModel):
     shipment_no: str = Field(..., alias="Shipment-no")
@@ -91,6 +94,18 @@ def authenticate_user(email: str, password: str):
     if user and verify_password(password, user['hashed_password']):
         return user
     return None
+
+def update_user_role(username: str, role: str):
+    query = {"username": username}
+    update = {"$set": {"role": role}}
+    result = users_collection.update_one(query, update)
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+
+# Define a function to delete a user
+def delete_user(username: str):
+    query = {"username": username}
+    users_collection.delete_one(query)
 
 async def get_current_user_from_cookie(request: Request) -> dict:
     COOKIE_NAME = "access_token"
@@ -201,11 +216,8 @@ async def dashboard(request: Request):
 
 @app.get("/myAccount", response_class=HTMLResponse)
 async def my_account(request: Request,current_user: dict = Depends(get_current_user_from_cookie)):
-    if current_user:
-        return templates.TemplateResponse("MyAccount.html", {"request": request, "user": current_user})
-    else:
-        return templates.TemplateResponse("MyAccount.html", {"request": request, "error_message": "User not found"})
-
+    users=list(users_collection.find({})) if current_user["role"]=="admin" else None
+    return templates.TemplateResponse("MyAccount.html", {"request": request, "user": current_user,"users":users})
 
 @app.get("/shipments", response_class=HTMLResponse)
 async def get_shipments(request: Request, user: dict = Depends(get_current_user_from_cookie)):
@@ -233,6 +245,33 @@ async def get_shipments(request: Request, user: dict = Depends(get_current_user_
 @app.get("/newshipment", response_class=HTMLResponse)
 async def newshipment(request: Request):
     return templates.TemplateResponse("NewShipment.html", {"request": request})
+
+@app.get("/shipments")
+async def get_shipments(request: Request, query: str = ""):
+    shipments_collection = db.shipments
+    if query:
+        search_criteria = {"$or": [
+            {"username": {"$regex": query, "$options": "i"}},
+            {"container_no": {"$regex": query, "$options": "i"}},
+            {"route_details": {"$regex": query, "$options": "i"}},
+            {"goods_type": {"$regex": query, "$options": "i"}},
+            {"device": {"$regex": query, "$options": "i"}},
+            {"expected_delivery_date": {"$regex": query, "$options": "i"}},
+            {"po_number": {"$regex": query, "$options": "i"}},
+            {"delivery_number": {"$regex": query, "$options": "i"}},
+            {"ndc_number": {"$regex": query, "$options": "i"}},
+            {"batch_id": {"$regex": query, "$options": "i"}},
+            {"serial_number_of_goods": {"$regex": query, "$options": "i"}},
+            {"shipment_description": {"$regex": query, "$options": "i"}}
+        ]}
+        shipments = list(shipments_collection.find(search_criteria))
+    else:
+        shipments = list(shipments_collection.find())
+
+    for shipment in shipments:
+        shipment["expected_delivery_date"] = shipment["expected_delivery_date"].strftime("%Y-%m-%d")
+
+    return templates.TemplateResponse("shipments.html", {"request": request, "shipments": shipments})
 
 @app.post("/newshipment")
 async def create_shipment(
@@ -299,4 +338,26 @@ async def device_data(request: Request, current_user: dict = Depends(get_current
 def logout():
     # Clear session data or cookies
     # For demo, just redirect to login page
-    return RedirectResponse(url="/", headers={"Set-Cookie": "session_token=; Path=/; Max-Age=0"})
+    return RedirectResponse(url="/", headers={"Set-Cookie": "session_token=; Path=/; Max-Age=0"})  
+
+
+
+# Endpoint to update user role
+@app.put("/update-role/{username}")
+async def update_user_role_endpoint(username: str, request:RoleUpdateRequest):
+    try:
+        update_user_role(username, request.role)
+        return JSONResponse(content={"message": f"User role updated to {request.role}"})
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+# Endpoint to delete user
+@app.delete("/delete-user/{username}")
+async def delete_user_endpoint(username: str):
+    try:
+        delete_user(username)
+        return JSONResponse(content={"message": f"User {username} deleted"})
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

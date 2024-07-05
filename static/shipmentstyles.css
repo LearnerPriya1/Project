@@ -40,3 +40,35 @@ input[type="text"], input[type="date"], textarea, button {
     height: 40px; /* Reduced button height */
     cursor: pointer;
 }
+
+.search-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+}
+#search-input {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding-left: 30px;
+    font-size: 16px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: #ccc;
+}
+
+.search-container input:focus + .search-icon {
+    color: #000;
+}
+
+.card-container {
+    margin-top: 60px; /* Adjust margin if needed */
+}

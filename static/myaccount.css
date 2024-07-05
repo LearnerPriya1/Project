@@ -1,7 +1,15 @@
 body {
     background-color: #f9f9fa;
-    display:flex;
+    background-image: url('https://wallpaperaccess.com/full/2314983.jpg');
+    background-size: cover;
+    background-repeat: repeat; /* Prevents the background image from repeating */
+    background-position: center center; /* Centers the background image */
+    display: flex;
+    height: 100vh; /* Ensures the body takes up the full viewport height */
+    width: 100vw;
 }
+
+
 
 .padding {
     padding: 3rem !important
