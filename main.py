@@ -32,6 +32,7 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 client = MongoClient("mongodb+srv://enukolupriyanka:PriyankaE@empdetails.amw7vfl.mongodb.net/")
 db = client.SCMXpertLite
 users_collection = db.users
+device_collection = db.device_data
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -149,6 +150,8 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+
 
 @app.get("/", response_class=HTMLResponse)
 async def login_get(request: Request):
@@ -333,6 +336,21 @@ async def device_data(request: Request, current_user: dict = Depends(get_current
         return templates.TemplateResponse("forbidden.html", {"request":request})
     
     return templates.TemplateResponse("deviceData.html", {"request": request})
+
+@app.get("/data")
+def get_data():
+    # Retrieve all documents from the collection
+    data = list(device_collection.find({}, {"_id": 0}))  # Exclude the MongoDB ID from the results
+    return data
+
+@app.get("/device_data")
+def read_root(request: Request, current_user: dict = Depends(get_current_user_from_cookie)):
+    data = list(device_collection.find({}, {"_id": 0}))  # Exclude the MongoDB ID from the results
+    if current_user["role"]!="admin":
+        return templates.TemplateResponse("forbidden.html", {"request":request})
+    
+    return templates.TemplateResponse("deviceData.html", {"request": request, "data": data})
+
 
 @app.get("/logout", response_class=HTMLResponse)
 def logout():

@@ -5,13 +5,11 @@
 <link href="/static/myaccount.css" rel="stylesheet"></link>
 
 <style>
-
     .action-buttons button {
         padding: 5px 10px;
         font-size: 12px;
         min-width: 120px; /* Set a minimum width for the buttons */
     }
-
 </style>
 
 <div class="container">
@@ -78,17 +76,13 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for u in users %}
+                                    {% for u in users if u.role == "user" %}
                                     <tr style="text-align: center;">
                                         <td>{{ u.username }}</td>
                                         <td>{{ u.email }}</td>
                                         <td>{{ u.role }}</td>
                                         <td class="action-buttons">
-                                            {% if u.role == "user" %}
                                             <button class="btn btn-sm btn-primary" onclick="updateAsAdmin('{{ u.username }}')">Update as Admin</button>
-                                            {% else %}
-                                            <button class="btn btn-sm btn-primary" onclick="updateAsUser('{{ u.username }}')">Update as User</button>
-                                            {% endif %}
                                             <button class="btn btn-sm btn-danger" onclick="deleteUser('{{ u.username }}')">Delete User</button>
                                         </td>
                                     </tr>
@@ -106,58 +100,36 @@
 
 <script>
     function updateAsAdmin(username) {
-    fetch(`/update-role/${username}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ role: 'admin' })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data.message); // Handle success message
-        // Optionally update UI or perform additional actions
-        window.location.reload(); // Reload the page after action
-    })
-    .catch(error => {
-        console.error('Error:', error); // Handle error
-    });
-}
+        fetch(`/update-role/${username}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ role: 'admin' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message); // Handle success message
+            window.location.reload(); // Reload the page after action
+        })
+        .catch(error => {
+            console.error('Error:', error); // Handle error
+        });
+    }
 
-function updateAsUser(username) {
-    fetch(`/update-role/${username}`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ role: 'user' })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data.message); // Handle success message
-        // Optionally update UI or perform additional actions
-        window.location.reload(); // Reload the page after action
-    })
-    .catch(error => {
-        console.error('Error:', error); // Handle error
-    });
-}
-
-function deleteUser(username) {
-    fetch(`/delete-user/${username}`, {
-        method: 'DELETE'
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log(data.message); // Handle success message
-        // Optionally update UI or perform additional actions
-        window.location.reload(); // Reload the page after action
-    })
-    .catch(error => {
-        console.error('Error:', error); // Handle error
-    });
-}
-
+    function deleteUser(username) {
+        fetch(`/delete-user/${username}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message); // Handle success message
+            window.location.reload(); // Reload the page after action
+        })
+        .catch(error => {
+            console.error('Error:', error); // Handle error
+        });
+    }
 </script>
 
 {% endblock %}

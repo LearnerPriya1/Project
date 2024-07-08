@@ -1,5 +1,27 @@
 {% extends "sidebar.html" %}
 {% block content %}
 
-    <h1 style="text-align: center;"> This is the device data</data></h1>
+
+    <title>Device Data Table</title>
+    <h1>Device Data Table</h1>
+    <table border="1">
+        <tr>
+            <th>Battery Level</th>
+            <th>Device ID</th>
+            <th>First Sensor Temperature</th>
+            <th>Route From</th>
+            <th>Route To</th>
+        </tr>
+        {% for item in data %}
+        <tr>
+            <td>{{ item.Battery_Level }}</td>
+            <td>{{ item.Device_ID }}</td>
+            <td>{{ item.First_Sensor_temperature }}</td>
+            <td>{{ item.Route_From }}</td>
+            <td>{{ item.Route_To }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+
 {% endblock %}
