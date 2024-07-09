@@ -329,19 +329,19 @@ async def create_shipment(
         logging.error(f"Error processing shipment creation: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create shipment")
     
-@app.get("/device_data")
-async def device_data(request: Request, current_user: dict = Depends(get_current_user_from_cookie)):
-    # Ensure current_user role is 'admin' to access this endpoint
-    if current_user["role"] != "admin":
-        return templates.TemplateResponse("forbidden.html", {"request":request})
+# @app.get("/device_data")
+# async def device_data(request: Request, current_user: dict = Depends(get_current_user_from_cookie)):
+#     # Ensure current_user role is 'admin' to access this endpoint
+#     if current_user["role"] != "admin":
+#         return templates.TemplateResponse("forbidden.html", {"request":request})
     
-    return templates.TemplateResponse("deviceData.html", {"request": request})
+#     return templates.TemplateResponse("deviceData.html", {"request": request})
 
-@app.get("/data")
-def get_data():
-    # Retrieve all documents from the collection
-    data = list(device_collection.find({}, {"_id": 0}))  # Exclude the MongoDB ID from the results
-    return data
+# @app.get("/data")
+# def get_data():
+#     # Retrieve all documents from the collection
+#     data = list(device_collection.find({}, {"_id": 0}))  # Exclude the MongoDB ID from the results
+#     return data
 
 @app.get("/device_data")
 def read_root(request: Request, current_user: dict = Depends(get_current_user_from_cookie)):
