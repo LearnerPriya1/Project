@@ -1,14 +1,17 @@
 body {
-    background-image: url('https://wallpaperaccess.com/full/2314983.jpg');
+    background-image: url("https://img.freepik.com/free-photo/soft-vintage-gradient-blur-background-with-pastel-colored-well-use-as-studio-room-product-presentation-banner_1258-101995.jpg?ga=GA1.1.1307400096.1720537373&semt=ais_user");
     background-size: cover;
-    background-repeat: repeat; /* Prevents the background image from repeating */
     background-position: center center; /* Centers the background image */
     display: flex;
     height: 100vh; /* Ensures the body takes up the full viewport height */
     width: 100vw;
 }
 
-
+.action-buttons button {
+    padding: 5px 10px;
+    font-size: 12px;
+    min-width: 120px; /* Set a minimum width for the buttons */
+}
 
 .padding {
     padding: 3rem !important

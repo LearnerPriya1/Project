@@ -13,6 +13,7 @@ from datetime import datetime, timedelta, date
 import logging
 import os
 from dotenv import load_dotenv
+from starlette.middleware.base import BaseHTTPMiddleware
 
 
 load_dotenv()
@@ -151,6 +152,28 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+class TokenExpiryMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request: Request, call_next):
+        # Paths that require token validation
+        protected_paths = ["/dashboard_", "/myAccount", "/shipments", "/newshipment", "/device_data"]
+        
+        # Check if the request path is in the protected paths
+        if any(request.url.path.startswith(path) for path in protected_paths):
+            COOKIE_NAME = "access_token"
+            token = request.cookies.get(COOKIE_NAME)
+            
+            if token:
+                try:
+                    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+                    if datetime.utcnow() > datetime.utcfromtimestamp(payload["exp"]):
+                        raise JWTError("Token has expired")
+                except JWTError:
+                    return RedirectResponse(url="/logout")
+        
+        response = await call_next(request)
+        return response
+
+app.add_middleware(TokenExpiryMiddleware)
 
 
 @app.get("/", response_class=HTMLResponse)
@@ -214,8 +237,9 @@ async def register(request: Request, username: str = Form(...), password: str = 
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to register user")
 
 @app.get("/dashboard_", response_class=HTMLResponse)
-async def dashboard(request: Request):
-    return templates.TemplateResponse("dashboard.html", {"request": request})
+async def dashboard(request: Request, user: dict=Depends(get_current_user_from_cookie)):
+    username=user["username"]
+    return templates.TemplateResponse("dashboard.html", {"request": request,"username":username})
 
 @app.get("/myAccount", response_class=HTMLResponse)
 async def my_account(request: Request,current_user: dict = Depends(get_current_user_from_cookie)):
@@ -329,19 +353,6 @@ async def create_shipment(
         logging.error(f"Error processing shipment creation: {e}")
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to create shipment")
     
-# @app.get("/device_data")
-# async def device_data(request: Request, current_user: dict = Depends(get_current_user_from_cookie)):
-#     # Ensure current_user role is 'admin' to access this endpoint
-#     if current_user["role"] != "admin":
-#         return templates.TemplateResponse("forbidden.html", {"request":request})
-    
-#     return templates.TemplateResponse("deviceData.html", {"request": request})
-
-# @app.get("/data")
-# def get_data():
-#     # Retrieve all documents from the collection
-#     data = list(device_collection.find({}, {"_id": 0}))  # Exclude the MongoDB ID from the results
-#     return data
 
 @app.get("/device_data")
 def read_root(request: Request, current_user: dict = Depends(get_current_user_from_cookie)):

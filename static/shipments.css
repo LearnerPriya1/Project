@@ -1,7 +1,7 @@
 body {
-    background-image: url('https://wallpaperaccess.com/full/2314983.jpg');
+    background-color:#cbe4eb;
+    /* background-image: url("/static/images/still-life-supply-chain-representation.jpg"); */
     background-size: cover;
-    background-repeat: no-repeat;
     font-family: Arial, sans-serif;
     display: flex;
     justify-content: center;
@@ -39,6 +39,10 @@ body {
     justify-content: space-between;
     align-items: center;
     cursor: pointer;
+    font-size: 15px;
+}
+.card-header h3{
+    font-size: 20px;
 }
 .card-header h3 {
     margin: 0;
@@ -55,4 +59,31 @@ body {
     margin-top: 8px;
     color: #007bff;
     cursor: pointer;
+}
+.search-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    align-items: center;
+}
+#search-input {
+    padding: 5px 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding-left: 30px;
+    font-size: 16px;
+}
+
+.search-icon {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 16px;
+    color: black;
+}
+
+.search-container input:focus + .search-icon {
+    color: #000;
 }
