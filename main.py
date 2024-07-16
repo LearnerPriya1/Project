@@ -1,4 +1,5 @@
-from fastapi import FastAPI, Request, Form, Depends, HTTPException, status
+from http import client
+from fastapi import FastAPI, Query, Request, Form, Depends, HTTPException, status
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse, RedirectResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles 
@@ -22,6 +23,7 @@ load_dotenv()
 SECRET_KEY = os.getenv("SECRET_KEY")  # Replace with a secure random key
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES =int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
+MONGO_CLIENT=os.getenv("MongoClient")
 
 
 # Initialize FastAPI app and templates
@@ -30,7 +32,7 @@ templates = Jinja2Templates(directory="templates")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # MongoDB connection
-client = MongoClient("mongodb+srv://enukolupriyanka:PriyankaE@empdetails.amw7vfl.mongodb.net/")
+client=MongoClient(MONGO_CLIENT)
 db = client.SCMXpertLite
 users_collection = db.users
 device_collection = db.device_data
@@ -65,9 +67,9 @@ class Shipment(BaseModel):
     serial_number_of_goods: str = Field(..., alias="Serial-number-of-goods")
     shipment_description: str = Field(..., alias="Shipment-description")
 
-class Token(BaseModel):
-    access_token: str
-    token_type: str
+# class Token(BaseModel):
+#     access_token: str
+#     token_type: str
 
 class TokenData(BaseModel):
     email: Optional[str] = None
@@ -196,8 +198,7 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
         
         response = RedirectResponse(url=f"/dashboard_", status_code=status.HTTP_303_SEE_OTHER)
         response.set_cookie(key="access_token", value=access_token, httponly=True)
-        logging.info(f"Cookie Set: {response.headers.get('set-cookie')}")  # Debugging statement
-
+      
         return response
 
     except HTTPException as e:
@@ -216,8 +217,7 @@ async def register_get(request: Request):
 @app.post("/register")
 async def register(request: Request, username: str = Form(...), password: str = Form(...), email: str = Form(...)):
     try:
-        form_data = await request.form()
-        logging.info(f"Form Data Received: {form_data}")
+        # form_data = await request.form()
 
         # Check if user or email already exists
         if users_collection.find_one({"username": username}) or users_collection.find_one({"email": email}):
@@ -355,13 +355,28 @@ async def create_shipment(
     
 
 @app.get("/device_data")
-def read_root(request: Request, current_user: dict = Depends(get_current_user_from_cookie)):
-    data = list(device_collection.find({}, {"_id": 0}))  # Exclude the MongoDB ID from the results
-    if current_user["role"]!="admin":
-        return templates.TemplateResponse("forbidden.html", {"request":request})
-    
-    return templates.TemplateResponse("deviceData.html", {"request": request, "data": data})
+def read_root(
+    request: Request,
+    current_user: dict = Depends(get_current_user_from_cookie),
+    page: int = Query(1, alias="page"),
+    page_size: int = Query(10, alias="page_size")
+):
+    if current_user["role"] != "admin":
+        return templates.TemplateResponse("forbidden.html", {"request": request})
 
+    total_items = device_collection.count_documents({})
+    total_pages = (total_items + page_size - 1) // page_size
+    skips = page_size * (page - 1)
+    
+    data = list(device_collection.find({}, {"_id": 0}).skip(skips).limit(page_size))
+    
+    return templates.TemplateResponse("deviceData.html", {
+        "request": request,
+        "data": data,
+        "page": page,
+        "page_size": page_size,
+        "total_pages": total_pages
+    })
 
 @app.get("/logout", response_class=HTMLResponse)
 def logout():

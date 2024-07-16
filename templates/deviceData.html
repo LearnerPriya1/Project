@@ -5,11 +5,10 @@
 
 <title>Device Data</title>
 <div class="container">
-                      
-    <h1 style="text-align: center;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Device Data</h1>                    
+    <h1 style="text-align: center;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Device Data</h1>
     <div class="row" style="margin-left: 12%;">
-    <div class="col-12">
-        <div class="card">
+        <div class="col-12">
+            <div class="card">
                 <div class="table-responsive">
                     <table class="table">
                         <thead class="thead-light">
@@ -21,18 +20,46 @@
                                 <th>Route To</th>
                             </tr>
                         </thead>
-                        {% for item in data %}
-                        <tr>
-                            <td>{{ item.Battery_Level }}</td>
-                            <td>{{ item.Device_ID }}</td>
-                            <td>{{ item.First_Sensor_temperature }}</td>
-                            <td>{{ item.Route_From }}</td>
-                            <td>{{ item.Route_To }}</td>
-                        </tr>
-                        {% endfor %}
+                        <tbody>
+                            {% for item in data %}
+                            <tr>
+                                <td>{{ item.Battery_Level }}</td>
+                                <td>{{ item.Device_ID }}</td>
+                                <td>{{ item.First_Sensor_temperature }}</td>
+                                <td>{{ item.Route_From }}</td>
+                                <td>{{ item.Route_To }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
                 </div>
+                <!-- Pagination controls -->
+                <nav aria-label="Page navigation" style="margin-bottom: -10px;
+                margin-top: -15px">
+                    <ul class="pagination justify-content-center">
+                        {% if page > 1 %}
+                        <li class="page-item">
+                            <a class="page-link" href="/device_data?page={{ page - 1 }}&page_size={{ page_size }}" aria-label="Previous">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                        {% for p in range(1, total_pages + 1) %}
+                        <li class="page-item {% if p == page %}active{% endif %}">
+                            <a class="page-link" href="/device_data?page={{ p }}&page_size={{ page_size }}">{{ p }}</a>
+                        </li>
+                        {% endfor %}
+                        {% if page < total_pages %}
+                        <li class="page-item">
+                            <a class="page-link" href="/device_data?page={{ page + 1 }}&page_size={{ page_size }}" aria-label="Next">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
             </div>
         </div>
     </div>
+</div>
 {% endblock %}
