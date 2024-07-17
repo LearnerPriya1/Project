@@ -67,9 +67,6 @@ class Shipment(BaseModel):
     serial_number_of_goods: str = Field(..., alias="Serial-number-of-goods")
     shipment_description: str = Field(..., alias="Shipment-description")
 
-# class Token(BaseModel):
-#     access_token: str
-#     token_type: str
 
 class TokenData(BaseModel):
     email: Optional[str] = None
@@ -137,9 +134,7 @@ async def decode_token(token: str = Depends(oauth2_scheme)):
         logging.error(f"JWT decoding error: {e}")
         raise credentials_exception
     user = get_user(email=token_data.email, users_collection=users_collection)
-    logging.info(user)
-    logging.debug(f"User details from database: {user}")  # Add this line for debugging
-
+    
     if user is None :
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
     return user
@@ -217,8 +212,7 @@ async def register_get(request: Request):
 @app.post("/register")
 async def register(request: Request, username: str = Form(...), password: str = Form(...), email: str = Form(...)):
     try:
-        # form_data = await request.form()
-
+        
         # Check if user or email already exists
         if users_collection.find_one({"username": username}) or users_collection.find_one({"email": email}):
             message = "Username or email already exists"
@@ -339,10 +333,6 @@ async def create_shipment(
             "role": user["role"]
         }
 
-        # Optionally log received data for debugging purposes
-        logging.info(f"Received shipment data: {shipment_data}")
-
-        # Continue with your processing logic, e.g., saving to MongoDB
         shipments_collection = db.shipments
         shipments_collection.insert_one(shipment_data)
         successmsg = "New shipment has been successfully created"
@@ -381,7 +371,6 @@ def read_root(
 @app.get("/logout", response_class=HTMLResponse)
 def logout():
     # Clear session data or cookies
-    # For demo, just redirect to login page
     return RedirectResponse(url="/", headers={"Set-Cookie": "session_token=; Path=/; Max-Age=0"})  
 
 

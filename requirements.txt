@@ -1,4 +1,6 @@
+python
 fastApi
+uvicorn
 pymongo
 jose
 passlib

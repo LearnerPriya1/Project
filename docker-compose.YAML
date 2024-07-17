@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+
+  SCM:
+    image: priyankaexf/scmxpertlite:latest
+    ports:
+      - "8081:8081"
+  zookeeper:
+    image: bitnami/zookeeper
+    ports:
+      - "2181:2181"
+    depends_on:
+      - Project
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  kafka:
+    image: bitnami/kafka
+    ports:
+      - "9092:9092"
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_HEAP_OPTS=-Xmx1G  
+    depends_on:
+      - zookeeper
+
+  servers: 
+    image: priyankaexf/scmxpertlite-server:latest
+    ports:
+      - "12345:12345"
+    depends_on:
+      - kafka
+
+  producer:
+    image: priyankaexf/scmxpertlite-producer:latest
+    depends_on:
+      - servers
+
+  consumer:
+    image: priyankaexf/scmxpertlite-consumer:latest
+    depends_on:
+      - producer
