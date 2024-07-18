@@ -56,5 +56,5 @@ try:
 except KeyboardInterrupt:
     pass
 finally:
-    # Close the consumer gracefully
+    # Close the consumer
     consumer.close()

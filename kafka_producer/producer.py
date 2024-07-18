@@ -1,7 +1,7 @@
 import socket
 from time import sleep
 from json import dumps
-from confluent_kafka import Producer, KafkaException
+from confluent_kafka import Producer
 import os
 from dotenv import load_dotenv
 

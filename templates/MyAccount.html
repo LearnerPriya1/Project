@@ -51,42 +51,82 @@
                 </div>
             </div>
 
-            {% if user.role == "admin" %}
-            <div class="row container d-flex justify-content-center">
-                <div class="col-xl-10 col-md-12 justify-content-center">
-                    <div class="card">
-                        <div class="card-header">
-                            <h6 class="m-b-20 p-b-5 b-b-default f-w-600 text-center">User List</h6>
-                        </div>
-                        <div class="card-body">
-                            <table class="table table-bordered">
-                                <thead>
-                                    <tr style="text-align: center;">
-                                        <th>Name</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for u in users if u.role == "user" %}
-                                    <tr style="text-align: center;">
-                                        <td>{{ u.username }}</td>
-                                        <td>{{ u.email }}</td>
-                                        <td>{{ u.role }}</td>
-                                        <td class="action-buttons">
-                                            <button class="btn btn-sm btn-primary" onclick="updateAsAdmin('{{ u.username }}')">Update as Admin</button>
-                                            <button class="btn btn-sm btn-danger" onclick="deleteUser('{{ u.username }}')">Delete User</button>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
+            {% if user.role in ["admin", "super admin"] %}
+                <div class="row container d-flex justify-content-center">
+                    <div class="col-xl-10 col-md-12 justify-content-center">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-b-20 p-b-5 b-b-default f-w-600 text-center">User List</h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr style="text-align: center;">
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for u in users %}
+                                        <tr style="text-align: center;">
+                                            <td>{{ u.username }}</td>
+                                            <td>{{ u.email }}</td>
+                                            <td>{{ u.role }}</td>
+                                            <td class="action-buttons">
+                                                {% if u.role == "user" %}
+                                                <button class="btn btn-sm btn-primary" onclick="updateAsAdmin('{{ u.username }}')">Update as Admin</button>
+                                                {% endif %}
+                                                <button class="btn btn-sm btn-danger" onclick="deleteUser('{{ u.username }}')">Delete User</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            {% endif %}
+                {% if user.role == "super admin" %}
+                <div class="row container d-flex justify-content-center mt-4">
+                    <div class="col-xl-10 col-md-12 justify-content-center">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-b-20 p-b-5 b-b-default f-w-600 text-center">Admin List</h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr style="text-align: center;">
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for a in admins %}
+                                        <tr style="text-align: center;">
+                                            <td>{{ a.username }}</td>
+                                            <td>{{ a.email }}</td>
+                                            <td>{{ a.role }}</td>
+                                            <td class="action-buttons">
+                                                <button class="btn btn-sm btn-primary" onclick="updateAsUser('{{ a.username }}')">Update as User</button>
+
+                                                <button class="btn btn-sm btn-danger" onclick="deleteUser('{{ a.username }}')">Delete Admin</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endif %}
+
         </div>
     </div>
 </div>
@@ -99,6 +139,24 @@
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ role: 'admin' })
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.message); // Handle success message
+            window.location.reload(); // Reload the page after action
+        })
+        .catch(error => {
+            console.error('Error:', error); // Handle error
+        });
+    }
+
+    function updateAsUser(username) {
+        fetch(`/update-role/${username}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ role: 'user' })
         })
         .then(response => response.json())
         .then(data => {

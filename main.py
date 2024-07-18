@@ -108,13 +108,16 @@ def delete_user(username: str):
     query = {"username": username}
     users_collection.delete_one(query)
 
-async def get_current_user_from_cookie(request: Request) -> dict:
-    COOKIE_NAME = "access_token"
-    token = request.cookies.get(COOKIE_NAME)
-    user_data = await decode_token(token)
-    if user_data is None:
-        return None
-    return user_data
+def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.utcnow() + timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
 
 async def decode_token(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
@@ -124,11 +127,7 @@ async def decode_token(token: str = Depends(oauth2_scheme)):
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
         email: str = payload.get("email")
-        role: str = payload.get("role")
-        if email is None :
-            raise credentials_exception
         token_data = TokenData(email=email)
     except JWTError as e:
         logging.error(f"JWT decoding error: {e}")
@@ -139,15 +138,13 @@ async def decode_token(token: str = Depends(oauth2_scheme)):
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
     return user
 
-def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
-    to_encode = data.copy()
-    if expires_delta:
-        expire = datetime.utcnow() + expires_delta
-    else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
-    to_encode.update({"exp": expire})
-    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
-    return encoded_jwt
+async def get_current_user_from_cookie(request: Request) -> dict:
+    COOKIE_NAME = "access_token"
+    token = request.cookies.get(COOKIE_NAME)
+    user_data = await decode_token(token)
+    if user_data is None:
+        return None
+    return user_data
 
 class TokenExpiryMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
@@ -236,9 +233,22 @@ async def dashboard(request: Request, user: dict=Depends(get_current_user_from_c
     return templates.TemplateResponse("dashboard.html", {"request": request,"username":username})
 
 @app.get("/myAccount", response_class=HTMLResponse)
-async def my_account(request: Request,current_user: dict = Depends(get_current_user_from_cookie)):
-    users=list(users_collection.find({})) if current_user["role"]=="admin" else None
-    return templates.TemplateResponse("MyAccount.html", {"request": request, "user": current_user,"users":users})
+async def my_account(request: Request, current_user: dict = Depends(get_current_user_from_cookie)):
+    users = None
+    admins = None
+
+    if current_user["role"] == "super admin":
+        users = list(users_collection.find({"role": "user"}))
+        admins = list(users_collection.find({"role": "admin"}))
+    elif current_user["role"] == "admin":
+        users = list(users_collection.find({"role": "user"}))
+
+    return templates.TemplateResponse("MyAccount.html", {
+        "request": request,
+        "user": current_user,
+        "users": users,
+        "admins": admins
+    })
 
 @app.get("/shipments", response_class=HTMLResponse)
 async def get_shipments(request: Request, user: dict = Depends(get_current_user_from_cookie)):
@@ -253,7 +263,7 @@ async def get_shipments(request: Request, user: dict = Depends(get_current_user_
             # Users can see only shipments created by users
             shipments = list(shipments_collection.find({"role": "user"}))
 
-        # Ensure dates are converted to string format for display
+        # Ensure dates are converted to string format for display, otherwise it will give us date with the timestamp
         for shipment in shipments:
             if "expected_delivery_date" in shipment:
                 shipment["expected_delivery_date"] = shipment["expected_delivery_date"].strftime("%Y-%m-%d")
@@ -288,9 +298,6 @@ async def get_shipments(request: Request, query: str = ""):
         shipments = list(shipments_collection.find(search_criteria))
     else:
         shipments = list(shipments_collection.find())
-
-    for shipment in shipments:
-        shipment["expected_delivery_date"] = shipment["expected_delivery_date"].strftime("%Y-%m-%d")
 
     return templates.TemplateResponse("shipments.html", {"request": request, "shipments": shipments})
 

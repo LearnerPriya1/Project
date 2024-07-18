@@ -125,5 +125,10 @@
         document.getElementById("clear-button").addEventListener("click", function() {
             document.getElementById("shipment-form").reset();
         });
+        window.onload = function() {
+            var today = new Date().toISOString().split('T')[0];
+            document.getElementById("Expected-delivery-date").setAttribute('min', today);
+        };
+
     </script>
 {% endblock %}
