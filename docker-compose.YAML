@@ -2,10 +2,10 @@ version: '3.8'
 
 services:
 
-  SCM:
+  Project:
     image: priyankaexf/scmxpertlite:latest
     ports:
-      - "8081:8081"
+      - "8000:8000"
   zookeeper:
     image: bitnami/zookeeper
     ports:
@@ -27,18 +27,18 @@ services:
       - zookeeper
 
   servers: 
-    image: priyankaexf/scmxpertlite-server:latest
+    image:  priyankaexf/server:latest
     ports:
-      - "12345:12345"
+      - "8080:8080"
     depends_on:
       - kafka
 
   producer:
-    image: priyankaexf/scmxpertlite-producer:latest
+    image: priyankaexf/kafka-producer:latest
     depends_on:
       - servers
 
   consumer:
-    image: priyankaexf/scmxpertlite-consumer:latest
+    image: priyankaexf/kafka-consumer:latest
     depends_on:
       - producer

@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 PORT = int(os.getenv("Port"))
+print("port")
 SERVER = socket.gethostbyname(socket.gethostname())
 print(SERVER)
 ADDR = ("", PORT)

@@ -11,7 +11,7 @@ RUN pip install confluent_kafka python-dotenv
 COPY . /Project/kafka_producer
 
 # Expose port 80 for the FastAPI app to listen on
-EXPOSE 12345
+EXPOSE 8080
 
 # Define the command to run your FastAPI application when the container starts
 CMD ["python", "producer.py"]

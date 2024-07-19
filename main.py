@@ -44,11 +44,11 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Pydantic models
-class UserInDB(BaseModel):
-    username: str
-    hashed_password: str
-    email: str
-    role: str  
+# class UserInDB(BaseModel):
+#     username: str
+#     hashed_password: str
+#     email: str
+#     role: str  
 
 class RoleUpdateRequest(BaseModel):
     role: str
@@ -177,11 +177,11 @@ async def login_get(request: Request):
 @app.post("/login")
 async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
     try:
-        user = authenticate_user(form_data.email, form_data.password)
+        user = authenticate_user(form_data.username, form_data.password)
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect username or password",
+                detail="Incorrect Email or password",
                 headers={"WWW-Authenticate": "Bearer"},
             )
 

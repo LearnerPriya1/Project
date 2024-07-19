@@ -9,8 +9,10 @@ load_dotenv()
 
 bootstrap_servers = os.getenv("bootstrap_servers")
 Port = int(os.getenv("port"))
+print(Port)
 Topic_Name = os.getenv("topic")
 host = os.getenv("host")
+print(host)
 # Establish socket connection to server
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.connect((host, Port))
