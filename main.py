@@ -14,8 +14,6 @@ from datetime import datetime, timedelta, date
 import logging
 import os
 from dotenv import load_dotenv
-from starlette.middleware.base import BaseHTTPMiddleware
-
 
 load_dotenv()
 
@@ -24,6 +22,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")  # Replace with a secure random key
 ALGORITHM = os.getenv("ALGORITHM")
 ACCESS_TOKEN_EXPIRE_MINUTES =int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES"))
 MONGO_CLIENT=os.getenv("MongoClient")
+COOKIE_NAME=os.getenv("COOKIE_NAME")
 
 
 # Initialize FastAPI app and templates
@@ -44,12 +43,6 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 # Pydantic models
-# class UserInDB(BaseModel):
-#     username: str
-#     hashed_password: str
-#     email: str
-#     role: str  
-
 class RoleUpdateRequest(BaseModel):
     role: str
 
@@ -81,10 +74,6 @@ def get_password_hash(password):
 def get_user(email: str, users_collection):
     try:
         user = users_collection.find_one({"email": email})
-        if user:
-            logging.info(f"User '{email}' found: {user}")
-        else:
-            logging.warning(f"User '{email}' not found.")
         return user  # Return the user document found
     except PyMongoError as e:
         logging.error(f"PyMongoError fetching user '{email}' from MongoDB: {e}")
@@ -96,6 +85,7 @@ def authenticate_user(email: str, password: str):
         return user
     return None
 
+#function to update user role
 def update_user_role(username: str, role: str):
     query = {"username": username}
     update = {"$set": {"role": role}}
@@ -103,7 +93,7 @@ def update_user_role(username: str, role: str):
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="User not found")
 
-# Define a function to delete a user
+#function to delete a user
 def delete_user(username: str):
     query = {"username": username}
     users_collection.delete_one(query)
@@ -130,52 +120,29 @@ async def decode_token(token: str = Depends(oauth2_scheme)):
         email: str = payload.get("email")
         token_data = TokenData(email=email)
     except JWTError as e:
-        logging.error(f"JWT decoding error: {e}")
         raise credentials_exception
+    
     user = get_user(email=token_data.email, users_collection=users_collection)
     
     if user is None :
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Insufficient permissions")
     return user
 
-async def get_current_user_from_cookie(request: Request) -> dict:
-    COOKIE_NAME = "access_token"
+async def get_current_user(request: Request) -> dict:
+    COOKIE_NAME = "COOKIE_NAME"
     token = request.cookies.get(COOKIE_NAME)
-    user_data = await decode_token(token)
-    if user_data is None:
+    if not token:
         return None
+    user_data = await decode_token(token)
     return user_data
-
-class TokenExpiryMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        # Paths that require token validation
-        protected_paths = ["/dashboard_", "/myAccount", "/shipments", "/newshipment", "/device_data"]
-        
-        # Check if the request path is in the protected paths
-        if any(request.url.path.startswith(path) for path in protected_paths):
-            COOKIE_NAME = "access_token"
-            token = request.cookies.get(COOKIE_NAME)
-            
-            if token:
-                try:
-                    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-                    if datetime.utcnow() > datetime.utcfromtimestamp(payload["exp"]):
-                        raise JWTError("Token has expired")
-                except JWTError:
-                    return RedirectResponse(url="/logout")
-        
-        response = await call_next(request)
-        return response
-
-app.add_middleware(TokenExpiryMiddleware)
 
 
 @app.get("/", response_class=HTMLResponse)
-async def login_get(request: Request):
+def login_get(request: Request):
     return templates.TemplateResponse("SignIn.html", {"request": request})
 
 @app.post("/login")
-async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
+def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends()):
     try:
         user = authenticate_user(form_data.username, form_data.password)
         if not user:
@@ -187,27 +154,22 @@ async def login(request: Request, form_data: OAuth2PasswordRequestForm = Depends
 
         access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
         access_token = create_access_token(data={"sub": user["username"], "email": user["email"], "role": user["role"]}, expires_delta=access_token_expires)
-        
         response = RedirectResponse(url=f"/dashboard_", status_code=status.HTTP_303_SEE_OTHER)
-        response.set_cookie(key="access_token", value=access_token, httponly=True)
+        response.set_cookie(key="COOKIE_NAME", value=access_token, httponly=True)
       
         return response
-
     except HTTPException as e:
         error_message = e.detail
         logging.error(f"HTTPException in login: {error_message}")
-    except Exception as e:
-        error_message = "An error occurred while processing your request."
-        logging.error(f"Error in login: {str(e)}")
 
     return templates.TemplateResponse("SignIn.html", {"request": request, "error_message": error_message})
 
 @app.get("/sign_up", response_class=HTMLResponse)
-async def register_get(request: Request):
+def register_get(request: Request):
     return templates.TemplateResponse("SignUp.html", {"request": request})
 
 @app.post("/register")
-async def register(request: Request, username: str = Form(...), password: str = Form(...), email: str = Form(...)):
+def register(request: Request, username: str = Form(...), password: str = Form(...), email: str = Form(...)):
     try:
         
         # Check if user or email already exists
@@ -228,12 +190,17 @@ async def register(request: Request, username: str = Form(...), password: str = 
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to register user")
 
 @app.get("/dashboard_", response_class=HTMLResponse)
-async def dashboard(request: Request, user: dict=Depends(get_current_user_from_cookie)):
+def dashboard(request: Request, user: dict=Depends(get_current_user)):
+    if not user:
+        return RedirectResponse(url="/")
     username=user["username"]
     return templates.TemplateResponse("dashboard.html", {"request": request,"username":username})
 
 @app.get("/myAccount", response_class=HTMLResponse)
-async def my_account(request: Request, current_user: dict = Depends(get_current_user_from_cookie)):
+async def my_account(request: Request, current_user: dict = Depends(get_current_user)):
+    if not current_user:
+        return RedirectResponse(url="/logout")
+    
     users = None
     admins = None
 
@@ -250,20 +217,28 @@ async def my_account(request: Request, current_user: dict = Depends(get_current_
         "admins": admins
     })
 
+    
+
 @app.get("/shipments", response_class=HTMLResponse)
-async def get_shipments(request: Request, user: dict = Depends(get_current_user_from_cookie)):
+async def get_shipments(request: Request, user: dict = Depends(get_current_user)):
+    if not user:
+        return RedirectResponse(url="/logout")
+    
     try:
-        shipments_collection = db.shipments
+        shipments_collection=db.shipments
         current_user_role = user.get("role")
         
-        if current_user_role == "admin":
-            # Admins can see all shipments
+        if current_user_role == "super admin":
+            # Super Admins can see all shipments
             shipments = list(shipments_collection.find({}))
+        elif current_user_role == "admin":
+            # Admins can see shipments created by admin or user
+            shipments = list(shipments_collection.find({"$or": [{"role": "admin"}, {"role": "user"}]}))
         else:
             # Users can see only shipments created by users
             shipments = list(shipments_collection.find({"role": "user"}))
 
-        # Ensure dates are converted to string format for display, otherwise it will give us date with the timestamp
+        # Ensure dates are converted to string format for display
         for shipment in shipments:
             if "expected_delivery_date" in shipment:
                 shipment["expected_delivery_date"] = shipment["expected_delivery_date"].strftime("%Y-%m-%d")
@@ -274,11 +249,13 @@ async def get_shipments(request: Request, user: dict = Depends(get_current_user_
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Failed to fetch shipments")
 
 @app.get("/newshipment", response_class=HTMLResponse)
-async def newshipment(request: Request):
+def newshipment(request: Request,user: dict=Depends(get_current_user)):
+    if not user:
+        return RedirectResponse(url="/logout")
     return templates.TemplateResponse("NewShipment.html", {"request": request})
 
 @app.get("/shipments")
-async def get_shipments(request: Request, query: str = ""):
+def get_shipments(request: Request, query: str = "", user: dict=Depends(get_current_user)):
     shipments_collection = db.shipments
     if query:
         search_criteria = {"$or": [
@@ -296,15 +273,15 @@ async def get_shipments(request: Request, query: str = ""):
             {"shipment_description": {"$regex": query, "$options": "i"}}
         ]}
         shipments = list(shipments_collection.find(search_criteria))
-    else:
         shipments = list(shipments_collection.find())
-
     return templates.TemplateResponse("shipments.html", {"request": request, "shipments": shipments})
 
+
+
 @app.post("/newshipment")
-async def create_shipment(
+def create_shipment(
     request: Request,
-    user: dict =Depends(get_current_user_from_cookie),
+    user: dict =Depends(get_current_user),
     Shipment_no: str = Form(...),
     Container_no: str = Form(...),
     Route_details: str = Form(...),
@@ -352,28 +329,34 @@ async def create_shipment(
     
 
 @app.get("/device_data")
-def read_root(
+def get_device_data(
     request: Request,
-    current_user: dict = Depends(get_current_user_from_cookie),
+    current_user: dict = Depends(get_current_user),
     page: int = Query(1, alias="page"),
     page_size: int = Query(10, alias="page_size")
 ):
-    if current_user["role"] != "admin":
-        return templates.TemplateResponse("forbidden.html", {"request": request})
+    
+    if not current_user:
+        return RedirectResponse(url="/logout")
 
-    total_items = device_collection.count_documents({})
-    total_pages = (total_items + page_size - 1) // page_size
-    skips = page_size * (page - 1)
+    if current_user["role"] not in ["admin","super admin"]:
+        return templates.TemplateResponse("forbidden.html", {"request": request})
     
-    data = list(device_collection.find({}, {"_id": 0}).skip(skips).limit(page_size))
+    else:
+        total_items = device_collection.count_documents({})
+        total_pages = (total_items + page_size - 1) // page_size
+        skips = page_size * (page - 1)
+        
+        data = list(device_collection.find({}, {"_id": 0}).skip(skips).limit(page_size))
+        
+        return templates.TemplateResponse("deviceData.html", {
+            "request": request,
+            "data": data,
+            "page": page,
+            "page_size": page_size,
+            "total_pages": total_pages
+        })
     
-    return templates.TemplateResponse("deviceData.html", {
-        "request": request,
-        "data": data,
-        "page": page,
-        "page_size": page_size,
-        "total_pages": total_pages
-    })
 
 @app.get("/logout", response_class=HTMLResponse)
 def logout():
@@ -384,7 +367,7 @@ def logout():
 
 # Endpoint to update user role
 @app.put("/update-role/{username}")
-async def update_user_role_endpoint(username: str, request:RoleUpdateRequest):
+def update_user_role_endpoint(username: str, request:RoleUpdateRequest):
     try:
         update_user_role(username, request.role)
         return JSONResponse(content={"message": f"User role updated to {request.role}"})
@@ -395,7 +378,7 @@ async def update_user_role_endpoint(username: str, request:RoleUpdateRequest):
 
 # Endpoint to delete user
 @app.delete("/delete-user/{username}")
-async def delete_user_endpoint(username: str):
+def delete_user_endpoint(username: str):
     try:
         delete_user(username)
         return JSONResponse(content={"message": f"User {username} deleted"})

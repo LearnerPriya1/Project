@@ -1,7 +1,5 @@
 body {
-    background-image: url("https://img.freepik.com/free-photo/soft-vintage-gradient-blur-background-with-pastel-colored-well-use-as-studio-room-product-presentation-banner_1258-101995.jpg?ga=GA1.1.1307400096.1720537373&semt=ais_user");
-    background-size: cover;
-    background-position: center center; /* Centers the background image */
+    background-color: #94d8db;
     display: flex;
     height: 100vh; /* Ensures the body takes up the full viewport height */
     width: 100vw;

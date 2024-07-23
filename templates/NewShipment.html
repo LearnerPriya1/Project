@@ -22,11 +22,11 @@
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="Shipment-no" class="form-control-label">Shipment Number*</label>
-                                <input type="text" id="Shipment-no" name="Shipment_no" class="form-control" placeholder="Enter Shipment Number" required>
+                                <input type="text" id="Shipment-no" name="Shipment_no" class="form-control" placeholder="Enter Shipment Number" maxlength="8" pattern="\d{8}" title="Shipment number must be 8 digits" required>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="Container-no" class="form-control-label">Container Number*</label>
-                                <input type="text" id="Container-no" name="Container_no" class="form-control" placeholder="Enter Container number" required>
+                                <input type="text" id="Container-no" name="Container_no" class="form-control" placeholder="Enter Container number" maxlength="8" pattern="\d{8}" title="Container number must be 8 digits" required>
                             </div>
                         </div>
                         <div class="row">
@@ -79,27 +79,27 @@
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="PO-number" class="form-control-label">PO Number*</label>
-                                <input type="text" id="PO-number" name="PO_number" class="form-control" placeholder="Enter PO Number" required>
+                                <input type="text" id="PO-number" name="PO_number" class="form-control" placeholder="Enter PO Number" maxlength="10" pattern="\d{10}" title="PO number must be exactly 10 digits" required>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="Delivery-number" class="form-control-label">Delivery Number*</label>
-                                <input type="text" id="Delivery-number" name="Delivery_number" class="form-control" placeholder="Enter Delivery Number" required>
+                                <input type="text" id="Delivery-number" name="Delivery_number" class="form-control" placeholder="Enter Delivery Number" maxlength="8" pattern="\d{8}" title="Delivery number must be 8 digits" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="NDC-number" class="form-control-label">NDC Number*</label>
-                                <input type="text" id="NDC-number" name="NDC_number" class="form-control" placeholder="Enter NDC Number" required>
+                                <input type="text" id="NDC-number" name="NDC_number" class="form-control" placeholder="Enter NDC Number" maxlength="8" pattern="\d{8}" title="NDC number must be 8 digits" required>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="Batch-id" class="form-control-label">Batch Id*</label>
-                                <input type="text" id="Batch-id" name="Batch_id" class="form-control" placeholder="Enter Batch Id" required>
+                                <input type="text" id="Batch-id" name="Batch_id" class="form-control" placeholder="Enter Batch Id" maxlength="8" pattern="\d{8}" title="Batch ID must be 8 digits" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="Serial-number-of-goods" class="form-control-label">Serial Number of Goods*</label>
-                                <input type="text" id="Serial-number-of-goods" name="Serial_number_of_goods" class="form-control" placeholder="Enter Serial Number of Goods" required>
+                                <input type="text" id="Serial-number-of-goods" name="Serial_number_of_goods" class="form-control" placeholder="Enter Serial Number of Goods" maxlength="8" pattern="\d{8}" title="Serial number must be 8 digits" required>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="Shipment-description" class="form-control-label">Shipment Description*</label>

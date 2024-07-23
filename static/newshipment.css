@@ -4,12 +4,10 @@ body::-webkit-scrollbar {
 }
 
 body {
+    background-color: #94d8db;
     color: white;
     overflow-x: hidden;
     height: 100%;
-    background-image: url("/static/images/NewShipment.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
 }
 
 .card {

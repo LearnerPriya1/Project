@@ -50,7 +50,43 @@
                     </div>
                 </div>
             </div>
+            {% if user.role == "super admin" %}
+                <div class="row container d-flex justify-content-center mt-4">
+                    <div class="col-xl-10 col-md-12 justify-content-center">
+                        <div class="card">
+                            <div class="card-header">
+                                <h6 class="m-b-20 p-b-5 b-b-default f-w-600 text-center">Admin List</h6>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-bordered">
+                                    <thead>
+                                        <tr style="text-align: center;">
+                                            <th>Name</th>
+                                            <th>Email</th>
+                                            <th>Role</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for a in admins %}
+                                        <tr style="text-align: center;">
+                                            <td>{{ a.username }}</td>
+                                            <td>{{ a.email }}</td>
+                                            <td>{{ a.role }}</td>
+                                            <td class="action-buttons">
+                                                <button class="btn btn-sm btn-primary" onclick="updateAsUser('{{ a.username }}')">Update as User</button>
 
+                                                <button class="btn btn-sm btn-danger" onclick="deleteUser('{{ a.username }}')">Delete Admin</button>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             {% if user.role in ["admin", "super admin"] %}
                 <div class="row container d-flex justify-content-center">
                     <div class="col-xl-10 col-md-12 justify-content-center">
@@ -88,43 +124,7 @@
                         </div>
                     </div>
                 </div>
-                {% if user.role == "super admin" %}
-                <div class="row container d-flex justify-content-center mt-4">
-                    <div class="col-xl-10 col-md-12 justify-content-center">
-                        <div class="card">
-                            <div class="card-header">
-                                <h6 class="m-b-20 p-b-5 b-b-default f-w-600 text-center">Admin List</h6>
-                            </div>
-                            <div class="card-body">
-                                <table class="table table-bordered">
-                                    <thead>
-                                        <tr style="text-align: center;">
-                                            <th>Name</th>
-                                            <th>Email</th>
-                                            <th>Role</th>
-                                            <th>Actions</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for a in admins %}
-                                        <tr style="text-align: center;">
-                                            <td>{{ a.username }}</td>
-                                            <td>{{ a.email }}</td>
-                                            <td>{{ a.role }}</td>
-                                            <td class="action-buttons">
-                                                <button class="btn btn-sm btn-primary" onclick="updateAsUser('{{ a.username }}')">Update as User</button>
-
-                                                <button class="btn btn-sm btn-danger" onclick="deleteUser('{{ a.username }}')">Delete Admin</button>
-                                            </td>
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
+                
                 {% endif %}
 
         </div>
