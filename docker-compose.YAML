@@ -1,9 +1,9 @@
-version: '3.8'
+version: '3.11.3'
 
 services:
 
   Project:
-    image: priyankaexf/scmxpertlite:latest
+    image: project:latest
     ports:
       - "8000:8000"
   zookeeper:
@@ -27,18 +27,18 @@ services:
       - zookeeper
 
   servers: 
-    image:  priyankaexf/server:latest
+    image:  kafka:latest
     ports:
       - "8080:8080"
     depends_on:
       - kafka
 
   producer:
-    image: priyankaexf/kafka-producer:latest
+    image: kafka_producer:latest
     depends_on:
       - servers
 
   consumer:
-    image: priyankaexf/kafka-consumer:latest
+    image: kafka_consumer:latest
     depends_on:
       - producer

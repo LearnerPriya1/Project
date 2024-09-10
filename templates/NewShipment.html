@@ -7,50 +7,58 @@
 
 <div class="container justify-content-center"> 
     <div class="form-container">
-        <h3 class="text-center mt-3" style="color: black;">Create New Shipment</h3>
+        <h3 class="text-center mt-3" style="color: rgb(0, 0, 0);">Create New Shipment</h3>
         
         <div class="container">
             <div class="card">
                 <h5 class="text-center">Please fill out the details</h5>
                 <div style="text-align: center;">
-                    {% if successmsg %}
-                        <h6 style="color: rgb(98, 245, 12);">{{ successmsg }}</h6>
+
+                    {% if message %}
+                        {%if message_type == 'success'%}
+                            <h6 style="color: rgb(11, 243, 11)"> {{ message }} </h6>
+                        {%endif%}
+                        {%if message_type == 'failed'%}
+                            <h6 style="color: rgb(228, 12, 12)"> {{ message }} </h6>
+                        {%endif%}
                     {% endif %}
+
+                    
                 </div>
                 <form action="/newshipment" method="post" id="shipment-form">
                     <div class="form-card section active" id="new-shipment-section">
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="Shipment-no" class="form-control-label">Shipment Number*</label>
-                                <input type="text" id="Shipment-no" name="Shipment_no" class="form-control" placeholder="Enter Shipment Number" maxlength="8" pattern="\d{8}" title="Shipment number must be 8 digits" required>
+                                <input type="text" id="Shipment_no" name="Shipment_no" class="form-control" placeholder="Enter Shipment Number" maxlength="8" pattern="\d{8}" title="Shipment number must be 8 digits" required>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="Container-no" class="form-control-label">Container Number*</label>
-                                <input type="text" id="Container-no" name="Container_no" class="form-control" placeholder="Enter Container number" maxlength="8" pattern="\d{8}" title="Container number must be 8 digits" required>
+                                <input type="text" id="Container_no" name="Container_no" class="form-control" placeholder="Enter Container number" maxlength="8" pattern="\d{8}" title="Container number must be 8 digits" required>
                             </div>
                         </div>
                         <div class="row">
                             <div  class="form-group col-md-6">
                                 <label for="Route-details" class="form-control-label">Route Details*</label>
-                                <select style="font-size:12px;" id="Route-details" name="Route_details" class="form-control" required>
-                                    <option value="">Select Route Details</option>
-                                    <option value="1">Chennai-India</option>
-                                    <option value="2">Bengaluru-India</option>
-                                    <option value="3">London-UK</option>
-                                    <option value="3">Newyork-USA</option>
-                                    <option value="3">USA-Newyork</option>
+                                <select style="font-size:12px;" id="Route_details" name="Route_details" class="form-control" required>
+                                    <option value="Select Route Details">Select Route Details</option>
+                                    <option value="Chennai-India">Chennai-India</option>
+                                    <option value="Bengaluru-India">Bengaluru-India</option>
+                                    <option value="London-UK">London-UK</option>
+                                    <option value="Newyork-USA">Newyork-USA</option>
+                                    <option value="USA-Newyork">USA-Newyork</option>
 
                                 </select>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="Goods-type" class="form-control-label">Goods Type*</label>
-                                <select style="font-size:12px;" id="Goods-type" name="Goods_type" class="form-control" required>
-                                    <option value="">Select Goods Type</option>
-                                    <option value="1">Electronics</option>
-                                    <option value="2">Medical</option>
-                                    <option value="3">Appliances</option>
-                                    <option value="4">Home Decors</option>
-                                    <option value="5">Automobiles</option>
+                                <select style="font-size:12px;" id="Goods_type" name="Goods_type" class="form-control" required>
+                                    <option value="Select Goods Type">Select Goods Type</option>
+                                    <option value="Electronics">Electronics</option>
+                                    <option value="Medical">Medical</option>
+                                    <option value="Appliances">Appliances</option>
+                                    <option value="Home Decors">Home Decors</option>
+                                    <option value="Automobiles">Automobiles</option>
 
                                 </select>
                             </div>
@@ -59,51 +67,51 @@
                             <div class="form-group col-md-6">
                                 <label for="Device" class="form-control-label">Device*</label>
                                 <select style="font-size:12px;" id="Device" name="Device" class="form-control" required>
-                                    <option value="">Select Device</option>
-                                    <option value="1">1150</option>
-                                    <option value="2">1151</option>
-                                    <option value="3">1152</option>
-                                    <option value="4">1153</option>
-                                    <option value="5">1154</option>
-                                    <option value="6">1155</option>
-                                    <option value="7">1156</option>
-                                    <option value="8">1157</option>
-                                    <option value="9">1158</option>
+                                    <option value="Select Device">Select Device</option>
+                                    <option value="1150">1150</option>
+                                    <option value="1151">1151</option>
+                                    <option value="1152">1152</option>
+                                    <option value="1153">1153</option>
+                                    <option value="1154">1154</option>
+                                    <option value="1155">1155</option>
+                                    <option value="1156">1156</option>
+                                    <option value="1157">1157</option>
+                                    <option value="1158">1158</option>
                                 </select>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="Expected-delivery-date" class="form-control-label">Expected Delivery Date*</label>
-                                <input type="date" id="Expected-delivery-date" name="Expected_delivery_date" class="form-control" required>
+                                <input type="date" id="Expected_delivery_date" name="Expected_delivery_date" class="form-control" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="PO-number" class="form-control-label">PO Number*</label>
-                                <input type="text" id="PO-number" name="PO_number" class="form-control" placeholder="Enter PO Number" maxlength="10" pattern="\d{10}" title="PO number must be exactly 10 digits" required>
+                                <input type="text" id="PO_number" name="PO_number" class="form-control" placeholder="Enter PO Number" maxlength="10" pattern="\d{10}" title="PO number must be exactly 10 digits" required>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="Delivery-number" class="form-control-label">Delivery Number*</label>
-                                <input type="text" id="Delivery-number" name="Delivery_number" class="form-control" placeholder="Enter Delivery Number" maxlength="8" pattern="\d{8}" title="Delivery number must be 8 digits" required>
+                                <input type="text" id="Delivery_number" name="Delivery_number" class="form-control" placeholder="Enter Delivery Number" maxlength="8" pattern="\d{8}" title="Delivery number must be 8 digits" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="NDC-number" class="form-control-label">NDC Number*</label>
-                                <input type="text" id="NDC-number" name="NDC_number" class="form-control" placeholder="Enter NDC Number" maxlength="8" pattern="\d{8}" title="NDC number must be 8 digits" required>
+                                <input type="text" id="NDC_number" name="NDC_number" class="form-control" placeholder="Enter NDC Number" maxlength="8" pattern="\d{8}" title="NDC number must be 8 digits" required>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="Batch-id" class="form-control-label">Batch Id*</label>
-                                <input type="text" id="Batch-id" name="Batch_id" class="form-control" placeholder="Enter Batch Id" maxlength="8" pattern="\d{8}" title="Batch ID must be 8 digits" required>
+                                <input type="text" id="Batch_id" name="Batch_id" class="form-control" placeholder="Enter Batch Id" maxlength="8" pattern="\d{8}" title="Batch ID must be 8 digits" required>
                             </div>
                         </div>
                         <div class="row">
                             <div class="form-group col-md-6">
                                 <label for="Serial-number-of-goods" class="form-control-label">Serial Number of Goods*</label>
-                                <input type="text" id="Serial-number-of-goods" name="Serial_number_of_goods" class="form-control" placeholder="Enter Serial Number of Goods" maxlength="8" pattern="\d{8}" title="Serial number must be 8 digits" required>
+                                <input type="text" id="Serial_number_of_goods" name="Serial_number_of_goods" class="form-control" placeholder="Enter Serial Number of Goods" maxlength="8" pattern="\d{8}" title="Serial number must be 8 digits" required>
                             </div>
                             <div class="form-group col-md-6">
                                 <label for="Shipment-description" class="form-control-label">Shipment Description*</label>
-                                <input type="text" id="Shipment-description" name="Shipment_description" class="form-control" placeholder="Description" required>
+                                <input type="text" id="Shipment_description" name="Shipment_description" class="form-control" placeholder="Description" required>
                             </div>
                         </div>
                         <div class="row justify-content-center">

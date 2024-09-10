@@ -15,10 +15,11 @@ body {
     flex-direction: column;
     min-width: 0;
     word-wrap: break-word;
-    background-color: #fff;
+    background-color: rgba(55,33,46,255);
     background-clip: border-box;
     border: 0px solid transparent;
     border-radius: 0px;
+    color: white;
 }
 
 .card-body {
@@ -38,7 +39,7 @@ body {
 }
 
 .table th, .table thead th {
-    font-weight: 500;
+    font-weight: bold;
     padding: 0.75rem; /* Adjust padding to make cells smaller */
 }
 

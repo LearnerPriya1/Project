@@ -2,17 +2,38 @@
 {% block content %}
 
 <link rel="stylesheet" href="/static/deviceData.css">
-
 <title>Device Data</title>
 <div class="container">
-    <h1 style="text-align: center; color: black;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Device Data</h1>
+    <!-- Dropdown form -->
+    <div class="row" style="margin-bottom: 20px;">
+        <div class="col-12">
+            <form id="filterForm" method="get" action="/device_data">
+                <div class="form-group">
+                    <h1 style="text-align: center; color: black;">Device Data</h1>
+                    <div style="margin-left: 70%;">
+                        <label for="device_id" style="font-size: 16px; color: black;">Select Device ID:</label><br>
+                        <select id="device_id" name="Device_ID" class="form-control" style="width: 200px; display: inline-block;" onchange="document.getElementById('filterForm').submit();">
+                            <option value="">All</option>
+                            {% for Device_ID in range(1150, 1159) %}
+                                <option value="{{ Device_ID }}" {% if selected_device_id == Device_ID|string %}selected{% endif %}>{{ Device_ID }}</option>
+                            {% endfor %}
+                        </select>
+                        <input type="hidden" name="page" value="{{ current_page }}">
+                        <input type="hidden" name="page_size" value="{{ page_size }}">
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Data Table -->
     <div class="row" style="margin-left: 12%;">
         <div class="col-12">
             <div class="card">
                 <div class="table-responsive">
                     <table class="table">
                         <thead class="thead-light">
-                            <tr>
+                            <tr style="color: black;">
                                 <th>Battery Level</th>
                                 <th>Device ID</th>
                                 <th>First Sensor Temperature</th>
@@ -34,24 +55,23 @@
                     </table>
                 </div>
                 <!-- Pagination controls -->
-                <nav aria-label="Page navigation" style="margin-bottom: -10px;
-                margin-top: -15px">
+                <nav aria-label="Page navigation" style="margin-bottom: -10px; margin-top: -15px;">
                     <ul class="pagination justify-content-center">
-                        {% if page > 1 %}
+                        {% if current_page > 1 %}
                         <li class="page-item">
-                            <a class="page-link" href="/device_data?page={{ page - 1 }}&page_size={{ page_size }}" aria-label="Previous">
+                            <a class="page-link" href="/device_data?page={{ current_page - 1 }}&page_size={{ page_size }}&Device_ID={{ selected_device_id }}" aria-label="Previous">
                                 <span aria-hidden="true">&laquo;</span>
                             </a>
                         </li>
                         {% endif %}
                         {% for p in range(1, total_pages + 1) %}
-                        <li class="page-item {% if p == page %}active{% endif %}">
-                            <a class="page-link" href="/device_data?page={{ p }}&page_size={{ page_size }}">{{ p }}</a>
+                        <li class="page-item {% if p == current_page %}active{% endif %}">
+                            <a class="page-link" href="/device_data?page={{ p }}&page_size={{ page_size }}&Device_ID={{ selected_device_id }}">{{ p }}</a>
                         </li>
                         {% endfor %}
-                        {% if page < total_pages %}
+                        {% if current_page < total_pages %}
                         <li class="page-item">
-                            <a class="page-link" href="/device_data?page={{ page + 1 }}&page_size={{ page_size }}" aria-label="Next">
+                            <a class="page-link" href="/device_data?page={{ current_page + 1 }}&page_size={{ page_size }}&Device_ID={{ selected_device_id }}" aria-label="Next">
                                 <span aria-hidden="true">&raquo;</span>
                             </a>
                         </li>
@@ -62,4 +82,12 @@
         </div>
     </div>
 </div>
+
+<script>
+    // JavaScript to submit the form when the dropdown value changes
+    document.getElementById('device_id').addEventListener('change', function() {
+        document.getElementById('filterForm').submit();
+    });
+</script>
+
 {% endblock %}
